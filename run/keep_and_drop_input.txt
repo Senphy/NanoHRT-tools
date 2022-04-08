@@ -7,6 +7,7 @@ drop Jet_*EF
 keep Jet_*EmEF
 
 # objects
+dropmatch n?boostedTau_.+
 dropmatch n?Tau_.+
 dropmatch n?SoftActivity.+
 dropmatch n?FsrPhoton_.+
@@ -26,6 +27,8 @@ keep HLT_Ele35_WPTight_Gsf
 keep HLT_PFMET*_PFMHT*_IDTight*
 keep HLT_Photon175
 keep HLT_Photon200
+keep HLT_BTagMu_AK8Jet300_Mu5
+keep HLT_BTagMu_AK4Jet300_Mu5
 keepmatch HLT_PFHT[0-9]+
 
 # L1/TrigObj

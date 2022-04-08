@@ -1,5 +1,6 @@
 # this is a comment
 dropmatch n?[A-Z][a-zA-Z0-9]{1,}.+
+dropmatch n?boostedTau_.+
 drop fixedGridRho*
 drop btagWeight_*
 # event info
@@ -15,6 +16,8 @@ keep HLT_Ele32_WPTight_Gsf
 keep HLT_Ele32_WPTight_Gsf_L1DoubleEG
 keep HLT_Ele35_WPTight_Gsf
 keep HLT_PFMET*_PFMHT*_IDTight*
+keep HLT_BTagMu_AK8Jet300_Mu5
+keep HLT_BTagMu_AK4Jet300_Mu5
 keepmatch HLT_PFHT[0-9]+
 # genweight
 keep genWeight
