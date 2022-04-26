@@ -13,7 +13,7 @@ default_config = {'sfbdt_threshold': -99,
                   'run_tagger': False, 'tagger_versions': ['V02b', 'V02c', 'V02d'],
                   'run_mass_regression': False, 'mass_regression_versions': ['V01a', 'V01b', 'V01c'],
                   'jec': False, 'jes': None, 'jes_source': '', 'jes_uncertainty_file_prefix': '',
-                  'jer': 'nominal', 'jmr': None, 'met_unclustered': None, 'smearMET': False, 'applyHEMUnc': False}
+                  'jer': False, 'jmr': None, 'met_unclustered': None, 'smearMET': False, 'applyHEMUnc': False}
 
 cut_dict_ak8 = {
     'photon': 'Sum$(Photon_pt>200 && Photon_cutBased>=2 && Photon_electronVeto)>0 && nFatJet>0',
