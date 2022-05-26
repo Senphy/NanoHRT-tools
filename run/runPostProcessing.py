@@ -547,7 +547,8 @@ def run_merge(args):
 
     status_file = os.path.join(args.outputdir, '.success')
     if os.path.exists(status_file):
-        return
+        # return
+        pass
 
     parts_dir = os.path.join(args.outputdir, 'parts')
     allfiles = [f for f in os.listdir(parts_dir) if f.endswith('.root')]

@@ -97,16 +97,38 @@ class TestBaseProducer(Module, object):
                 if self.isMC:
                     for ptsuf in ['', '50']:
                         pass
+                        for var in ['pt','eta','phi']:
+                            self.out.branch(prefix + "np{pt}_{var}".format(pt=ptsuf, var=var), "F", lenVar=prefix + "npart")
+                            self.out.branch(prefix + "gp{pt}_{var}".format(pt=ptsuf, var=var), "F", lenVar=prefix + "ngpart")
+                            self.out.branch(prefix + "cp{pt}_{var}".format(pt=ptsuf, var=var), "F", lenVar=prefix + "ncpart")
+                            self.out.branch(prefix + "bp{pt}_{var}".format(pt=ptsuf, var=var), "F", lenVar=prefix + "nbpart")
+                            self.out.branch(prefix + "lp{pt}_{var}".format(pt=ptsuf, var=var), "F", lenVar=prefix + "nlpart")
                         # self.out.branch(prefix + "npart{}".format(ptsuf), "I")
                         # self.out.branch(prefix + "nbpart{}".format(ptsuf), "I")
                         # self.out.branch(prefix + "ncpart{}".format(ptsuf), "I")
                         # self.out.branch(prefix + "ngpart{}".format(ptsuf), "I")
-                        # self.out.branch(prefix + "part{}_sumpt".format(ptsuf), "F")
-                        # self.out.branch(prefix + "bpart{}_sumpt".format(ptsuf), "F")
-                        # self.out.branch(prefix + "cpart{}_sumpt".format(ptsuf), "F")
-                        # self.out.branch(prefix + "gpart{}_sumpt".format(ptsuf), "F")
+        self.h_gp_bpart_2d = ROOT.TH2D('h_gp_bpart_2d', 'h_gp_bpart_2d', 20, -2.4, 2.4, 20, -3.2, 3.2)
+        self.h_gp_cpart_2d = ROOT.TH2D('h_gp_cpart_2d', 'h_gp_cpart_2d', 20, -2.4, 2.4, 20, -3.2, 3.2)
+        self.h_gp_gpart_2d = ROOT.TH2D('h_gp_gpart_2d', 'h_gp_gpart_2d', 20, -2.4, 2.4, 20, -3.2, 3.2)
+        self.h_gp_npart_2d = ROOT.TH2D('h_gp_npart_2d', 'h_gp_npart_2d', 20, -2.4, 2.4, 20, -3.2, 3.2)
+        self.h_gp_lpart_2d = ROOT.TH2D('h_gp_lpart_2d', 'h_gp_lpart_2d', 20, -2.4, 2.4, 20, -3.2, 3.2)
+        self.h_gp_bpart50_2d = ROOT.TH2D('h_gp_bpart50_2d', 'h_gp_bpart50_2d', 20, -2.4, 2.4, 20, -3.2, 3.2)
+        self.h_gp_cpart50_2d = ROOT.TH2D('h_gp_cpart50_2d', 'h_gp_cpart50_2d', 20, -2.4, 2.4, 20, -3.2, 3.2)
+        self.h_gp_gpart50_2d = ROOT.TH2D('h_gp_gpart50_2d', 'h_gp_gpart50_2d', 20, -2.4, 2.4, 20, -3.2, 3.2)
+        self.h_gp_npart50_2d = ROOT.TH2D('h_gp_npart50_2d', 'h_gp_npart50_2d', 20, -2.4, 2.4, 20, -3.2, 3.2)
+        self.h_gp_lpart50_2d = ROOT.TH2D('h_gp_lpart50_2d', 'h_gp_lpart50_2d', 20, -2.4, 2.4, 20, -3.2, 3.2)
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
+        self.h_gp_bpart_2d.Write()
+        self.h_gp_cpart_2d.Write()
+        self.h_gp_gpart_2d.Write()
+        self.h_gp_npart_2d.Write()
+        self.h_gp_lpart_2d.Write()
+        self.h_gp_bpart50_2d.Write()
+        self.h_gp_cpart50_2d.Write()
+        self.h_gp_gpart50_2d.Write()
+        self.h_gp_npart50_2d.Write()
+        self.h_gp_lpart50_2d.Write()
         pass
 
     def selectLeptons(self, event):
@@ -337,23 +359,62 @@ class TestBaseProducer(Module, object):
                 fj = event.fatjets[ifj]
                 fj.npart, fj.nbpart, fj.ncpart, fj.ngpart, fj.part_sumpt, fj.bpart_sumpt, fj.cpart_sumpt, fj.gpart_sumpt = 0, 0, 0, 0, 0, 0, 0, 0
                 fj.npart50, fj.nbpart50, fj.ncpart50, fj.ngpart50, fj.part50_sumpt, fj.bpart50_sumpt, fj.cpart50_sumpt, fj.gpart50_sumpt = 0, 0, 0, 0, 0, 0, 0, 0
+                fj.nlpart, fj.nlpart50, fj.lpart_sumpt, fj.lpart50_sumpt = 0, 0, 0, 0
+                for var in ['np', 'gp', 'cp', 'bp', 'lp']:
+                    for pt in ['', '50']:
+                        exec('fj.{var}{pt}={{"pt":[], "eta":[], "phi":[]}}'.format(var=var, pt=pt))
                 for gp in genparts:
                     if gp.status>70 and gp.status<80 and (gp.statusFlags & (1 << 13)) and abs(gp.pdgId) in [1,2,3,4,5,6,21] and gp.pt>=5 and deltaR(gp, fj)<=self._jetConeSize:
                         fj.npart += 1; fj.part_sumpt += gp.pt
+                        for var in ['pt', 'eta', 'phi']:
+                            exec('fj.np["{var}"].append(gp.{var})'.format(var=var))
+                        self.h_gp_npart_2d.Fill(gp.eta, gp.phi)
                         if gp.pdgId in [5, -5]:
                             fj.nbpart += 1; fj.bpart_sumpt += gp.pt
+                            for var in ['pt', 'eta', 'phi']:
+                                exec('fj.bp["{var}"].append(gp.{var})'.format(var=var))
+                            self.h_gp_bpart_2d.Fill(gp.eta, gp.phi)
                         elif gp.pdgId in [4, -4]:
                             fj.ncpart += 1; fj.cpart_sumpt += gp.pt
+                            for var in ['pt', 'eta', 'phi']:
+                                exec('fj.cp["{var}"].append(gp.{var})'.format(var=var))
+                            self.h_gp_cpart_2d.Fill(gp.eta, gp.phi)
                         elif gp.pdgId == 21:
                             fj.ngpart += 1; fj.gpart_sumpt += gp.pt
+                            for var in ['pt', 'eta', 'phi']:
+                                exec('fj.gp["{var}"].append(gp.{var})'.format(var=var))
+                            self.h_gp_gpart_2d.Fill(gp.eta, gp.phi)
+                        else:
+                            fj.nlpart += 1; fj.lpart_sumpt += gp.pt
+                            for var in ['pt', 'eta', 'phi']:
+                                exec('fj.lp["{var}"].append(gp.{var})'.format(var=var))
+                            self.h_gp_lpart_2d.Fill(gp.eta, gp.phi)
+
                         if gp.pt>=50:
                             fj.npart50 += 1; fj.part50_sumpt += gp.pt
+                            for var in ['pt', 'eta', 'phi']:
+                                exec('fj.np50["{var}"].append(gp.{var})'.format(var=var))
+                            self.h_gp_npart50_2d.Fill(gp.eta, gp.phi)
                             if gp.pdgId in [5, -5]:
                                 fj.nbpart50 += 1; fj.bpart50_sumpt += gp.pt
+                                for var in ['pt', 'eta', 'phi']:
+                                    exec('fj.bp50["{var}"].append(gp.{var})'.format(var=var))
+                                self.h_gp_bpart50_2d.Fill(gp.eta, gp.phi)
                             elif gp.pdgId in [4, -4]:
                                 fj.ncpart50 += 1; fj.cpart50_sumpt += gp.pt
+                                for var in ['pt', 'eta', 'phi']:
+                                    exec('fj.cp50["{var}"].append(gp.{var})'.format(var=var))
+                                self.h_gp_cpart50_2d.Fill(gp.eta, gp.phi)
                             elif gp.pdgId == 21:
                                 fj.ngpart50 += 1; fj.gpart50_sumpt += gp.pt
+                                for var in ['pt', 'eta', 'phi']:
+                                    exec('fj.gp50["{var}"].append(gp.{var})'.format(var=var))
+                                self.h_gp_gpart50_2d.Fill(gp.eta, gp.phi)
+                            else:
+                                fj.nlpart50 += 1; fj.lpart50_sumpt += gp.pt
+                                for var in ['pt', 'eta', 'phi']:
+                                    exec('fj.lp50["{var}"].append(gp.{var})'.format(var=var))
+                                self.h_gp_lpart50_2d.Fill(gp.eta, gp.phi)
 
 
     def evalTagger(self, event, jets):
@@ -414,6 +475,16 @@ class TestBaseProducer(Module, object):
             if self._fill_sv:
                 if self.isMC:
                     pass
+                    for flavor in ['gp','bp','cp','lp']:
+                        for var in ['pt','eta','phi']:
+                            for ptsuf in ['', '50']:
+                                print(prefix + "{flavor}{pt}_{var}".format(flavor=flavor, pt=ptsuf, var=var))
+                                exec('print(fj.n{flavor}art{pt})'.format(flavor=flavor, pt=ptsuf, var=var))
+                                exec('print(fj.{flavor}{pt}["{var}"])\n'.format(flavor=flavor, pt=ptsuf, var=var))
+                                exec('temp_var_ini=fj.{flavor}{pt}["{var}"]'.format(flavor=flavor, pt=ptsuf, var=var))
+                                temp_var = locals()['temp_var_ini']
+                                print(temp_var)
+                                self.out.fillBranch(prefix + "{flavor}{pt}_{var}".format(flavor=flavor, pt=ptsuf, var=var), temp_var)
                     # self.out.fillBranch(prefix + "npart", fj.npart)
                     # self.out.fillBranch(prefix + "nbpart", fj.nbpart)
                     # self.out.fillBranch(prefix + "ncpart", fj.ncpart)

@@ -331,10 +331,12 @@ class HeavyFlavBaseProducer(Module, object):
                         self.out.branch(prefix + "nbpart{}".format(ptsuf), "I")
                         self.out.branch(prefix + "ncpart{}".format(ptsuf), "I")
                         self.out.branch(prefix + "ngpart{}".format(ptsuf), "I")
+                        self.out.branch(prefix + "nlpart{}".format(ptsuf), "I")
                         self.out.branch(prefix + "part{}_sumpt".format(ptsuf), "F")
                         self.out.branch(prefix + "bpart{}_sumpt".format(ptsuf), "F")
                         self.out.branch(prefix + "cpart{}_sumpt".format(ptsuf), "F")
                         self.out.branch(prefix + "gpart{}_sumpt".format(ptsuf), "F")
+                        self.out.branch(prefix + "lpart{}_sumpt".format(ptsuf), "F")
          
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
@@ -580,6 +582,7 @@ class HeavyFlavBaseProducer(Module, object):
                 fj = event.fatjets[ifj]
                 fj.npart, fj.nbpart, fj.ncpart, fj.ngpart, fj.part_sumpt, fj.bpart_sumpt, fj.cpart_sumpt, fj.gpart_sumpt = 0, 0, 0, 0, 0, 0, 0, 0
                 fj.npart50, fj.nbpart50, fj.ncpart50, fj.ngpart50, fj.part50_sumpt, fj.bpart50_sumpt, fj.cpart50_sumpt, fj.gpart50_sumpt = 0, 0, 0, 0, 0, 0, 0, 0
+                fj.nlpart, fj.nlpart50, fj.lpart_sumpt, fj.lpart50_sumpt = 0, 0, 0, 0
                 for gp in genparts:
                     if gp.status>70 and gp.status<80 and (gp.statusFlags & (1 << 13)) and abs(gp.pdgId) in [1,2,3,4,5,6,21] and gp.pt>=5 and deltaR(gp, fj)<=self._jetConeSize:
                         fj.npart += 1; fj.part_sumpt += gp.pt
@@ -589,6 +592,8 @@ class HeavyFlavBaseProducer(Module, object):
                             fj.ncpart += 1; fj.cpart_sumpt += gp.pt
                         elif gp.pdgId == 21:
                             fj.ngpart += 1; fj.gpart_sumpt += gp.pt
+                        else:
+                            fj.nlpart += 1; fj.lpart_sumpt += gp.pt
                         if gp.pt>=50:
                             fj.npart50 += 1; fj.part50_sumpt += gp.pt
                             if gp.pdgId in [5, -5]:
@@ -597,6 +602,8 @@ class HeavyFlavBaseProducer(Module, object):
                                 fj.ncpart50 += 1; fj.cpart50_sumpt += gp.pt
                             elif gp.pdgId == 21:
                                 fj.ngpart50 += 1; fj.gpart50_sumpt += gp.pt
+                            else:
+                                fj.nlpart50 += 1; fj.lpart50_sumpt += gp.pt
 
 
     def evalTagger(self, event, jets):
@@ -938,15 +945,19 @@ class HeavyFlavBaseProducer(Module, object):
                     self.out.fillBranch(prefix + "nbpart", fj.nbpart)
                     self.out.fillBranch(prefix + "ncpart", fj.ncpart)
                     self.out.fillBranch(prefix + "ngpart", fj.ngpart)
+                    self.out.fillBranch(prefix + "nlpart", fj.nlpart)
                     self.out.fillBranch(prefix + "part_sumpt", fj.part_sumpt)
                     self.out.fillBranch(prefix + "bpart_sumpt", fj.bpart_sumpt)
                     self.out.fillBranch(prefix + "cpart_sumpt", fj.cpart_sumpt)
                     self.out.fillBranch(prefix + "gpart_sumpt", fj.gpart_sumpt)
+                    self.out.fillBranch(prefix + "lpart_sumpt", fj.lpart_sumpt)
                     self.out.fillBranch(prefix + "npart50", fj.npart50)
                     self.out.fillBranch(prefix + "nbpart50", fj.nbpart50)
                     self.out.fillBranch(prefix + "ncpart50", fj.ncpart50)
                     self.out.fillBranch(prefix + "ngpart50", fj.ngpart50)
+                    self.out.fillBranch(prefix + "nlpart50", fj.nlpart50)
                     self.out.fillBranch(prefix + "part50_sumpt", fj.part50_sumpt)
                     self.out.fillBranch(prefix + "bpart50_sumpt", fj.bpart50_sumpt)
                     self.out.fillBranch(prefix + "cpart50_sumpt", fj.cpart50_sumpt)
                     self.out.fillBranch(prefix + "gpart50_sumpt", fj.gpart50_sumpt)
+                    self.out.fillBranch(prefix + "lpart50_sumpt", fj.lpart50_sumpt)
